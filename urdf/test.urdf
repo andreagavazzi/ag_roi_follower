@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<robot name="Pan-Tilt">
+
+  <!-- the model -->
+  <link name="base_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="file:/home/andrea/catkin_ws/src/ag_blob_tracker/stl/Pan.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0.2 0.2 0.2 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="pan_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="F3"/>
+    <origin xyz="0 0 0.03994" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+
+  <link name="F3">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.03994"/>
+      <geometry>
+        <mesh filename="file:/home/andrea/catkin_ws/src/ag_blob_tracker/stl/F3.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.85 0.85 0.85 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="fixed_joint" type="fixed">
+    <parent link="F3"/>
+    <child link="tilt"/>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+
+  <link name="tilt">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.03994"/>
+      <geometry>
+        <mesh filename="file:/home/andrea/catkin_ws/src/ag_blob_tracker/stl/Tilt.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="black">
+      </material>
+    </visual>
+  </link>
+
+  <joint name="tilt" type="continuous">
+    <parent link="tilt"/>
+    <child link="F2"/>
+    <origin xyz="0 -0.0206 0.04155" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <link name="F2">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0.0206 -0.08149"/>
+      <geometry>
+        <mesh filename="file:/home/andrea/catkin_ws/src/ag_blob_tracker/stl/F2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey">
+      </material>
+    </visual>
+  </link>
+
+</robot>
+

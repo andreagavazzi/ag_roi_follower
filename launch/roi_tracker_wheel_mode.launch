@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="ag_roi_follower" name="roi_follower" type="roi_follower.py" output="screen"/>
+</launch>
