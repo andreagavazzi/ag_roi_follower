@@ -12,7 +12,7 @@ The node subscribes a /roi topic that brings a sensor_msgs/RegionOfInterest.msg:
 
 
 
-<img src="https://github.com/andreagavazzi/ag_roi_follower/blob/master/assets/pan_tilt.PNG" alt="Your image title" width="500"/>
+<img src="https://github.com/andreagavazzi/ag_roi_follower/tree/master/assets/pan_tilt.PNG" alt="Your image title" width="500"/>
 
 The difference with all the other pan&tilt subscribers is that my code is actually using the wheel mode of the Dynamixel motors.
 This is allowing smoother movements and quite a lean code. Perfect when used on a 2 dof head.
