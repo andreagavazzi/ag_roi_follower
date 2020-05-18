@@ -19,15 +19,15 @@ port = ports[0]
 rospy.loginfo('Connecting to the first available port: ' + str(port))
 
 dxl_io = pypot.dynamixel.DxlIO(port)
-ids = dxl_io.scan([1, 2])
+ids = dxl_io.scan([10, 11])
 rospy.loginfo('Connecting to Dinamixel id: ' + str(ids))
 rospy.loginfo('Ready to go!')
 
 
 # Parametri
-speed = 130  # base = 120
-pan = 1
-tilt = 2
+speed = 150  # base (wheel mode) = 120
+pan = 10
+tilt = 11
 pan_min = -75
 pan_max = 75
 tilt_min = -45
@@ -38,17 +38,9 @@ tolerance = 80
 
 
 def zero():
-    dxl_io.disable_torque([1, 2])
-    dxl_io.set_joint_mode([1, 2])
-    dxl_io.enable_torque([1, 2])
-    dxl_io.set_moving_speed({1: 200, 2: 200})
-    dxl_io.set_goal_position({1: 0, 2: 0})
+    dxl_io.set_moving_speed({pan: speed, tilt: speed})
+    dxl_io.set_goal_position({pan: 0, tilt: 0})
     time.sleep(1)
-    dxl_io.disable_torque([1, 2])
-    dxl_io.set_wheel_mode([1, 2])
-    dxl_io.enable_torque([1, 2])
-    stop(1)
-    stop(2)
 
 
 def stop(dyn):
@@ -59,6 +51,14 @@ def callback(data):
     roi = data     # recupera il roi dal subscriber
     roi_x_centre = roi.width/2 + roi.x_offset       # centro del roi x
     roi_y_centre = roi.height/2 + roi.y_offset      # centro del roi y
+
+    # movimento pan
+    if roi_x_centre > cam_width/2 + tolerance:
+        current = dxl_io.get_present_position((10, 11))[0]
+        dxl_io.set_goal_position({pan: current - 8})
+    elif roi_x_centre < cam_width/2 - tolerance:
+        current = dxl_io.get_present_position((10, 11))[0]
+        dxl_io.set_goal_position({pan: current + 8})
 
 
 def main():

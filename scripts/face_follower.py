@@ -3,11 +3,11 @@
 # Sottoscrive un topic /roi con messaggio RegionOfInterest e muove un dispositivo Pan&Tilt
 
 import rospy
-from sensor_msgs.msg import RegionOfInterest
+from opencv_apps.msg import FaceArrayStamped
 import time
 import pypot.dynamixel
 
-rospy.init_node('roi_follower')
+rospy.init_node('face_follower')
 
 # Connessione e inizializzazione pypot
 ports = pypot.dynamixel.get_available_ports()
@@ -25,7 +25,7 @@ rospy.loginfo('Ready to go!')
 
 
 # Parametri
-speed = 80  # base = 120
+speed = 60  # base = 120
 pan = 10
 tilt = 11
 pan_min = -90
@@ -52,10 +52,12 @@ def zero():
 
 
 def rotate_pan_plus():       # ruota in direzione + (CCW)
+    print 'pan plus'
     dxl_io.set_moving_speed({pan: 1 * speed})
 
 
 def rotate_pan_neg():       # ruota in direzione - (CW)
+    print 'pan minus'
     dxl_io.set_moving_speed({pan: -1 * speed})
 
 
@@ -83,17 +85,20 @@ def stop(dyn):
 
 
 def callback(data):
-    roi = data     # recupera il roi dal subscriber
-    roi_x_centre = roi.width/2 + roi.x_offset       # centro del roi x
-    roi_y_centre = roi.height/2 + roi.y_offset      # centro del roi y
-
-
+    roi = data     # recupera i dati dal subscriber
+    if len(roi.faces) > 0:
+        roi_x_centre = roi.faces[0].face.x       # centro del roi x
+        roi_y_centre = roi.faces[0].face.y      # centro del roi y
+        # print roi_x_centre, roi_y_centre
+    else:
+        roi_x_centre = roi_y_centre = 0
+        # print roi_x_centre, roi_y_centre
 # TODO: se il roi non cambia allora torna a zero dopo tot secondi
 # TODO: invece di stopparsi quando il roi vale zero prosegue per poco la direzione che aveva ?
 # TODO: zona tolleranza proporzionale alla larghezza del roi ?
 
 # Movimento pan
-    if roi.width > 0:
+    if roi_x_centre > 0:
         # print dxl_io.get_present_position((10, 11))[0]
         # ruota pan se il roi si trova fuori dalla zona di tolleranza
         if roi_x_centre > cam_width/2 + tolerance and dxl_io.get_present_position((10, 11))[0] > pan_min:
@@ -106,8 +111,8 @@ def callback(data):
         stop(pan)
 
 # Movimento tilt
-    if roi.height > 0:
-        # print dxl_io.get_present_position((10, 11))[1]
+    if roi_y_centre > 0:
+        print dxl_io.get_present_position((10, 11))[1]
         # ruota tilt se il roi si trova fuori dalla zona di tolleranza
         if roi_y_centre > cam_height/2 + tolerance and dxl_io.get_present_position((10, 11))[1] > tilt_min:
             rotate_tilt_plus()
@@ -119,13 +124,13 @@ def callback(data):
         stop(tilt)
 
 # Debug
-#    rospy.loginfo(str(dxl_io.get_present_position((1, 2))))
+# rospy.loginfo(str(dxl_io.get_present_position((1, 2))))
 
 
 def main():
     zero()
     while not rospy.is_shutdown():
-        rospy.Subscriber("/roi", RegionOfInterest, callback, queue_size=1)
+        rospy.Subscriber("/face_detection/faces", FaceArrayStamped, callback, queue_size=1)
         rospy.spin()
     rospy.on_shutdown(shutdown)
 
