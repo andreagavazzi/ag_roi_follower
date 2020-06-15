@@ -25,7 +25,7 @@ rospy.loginfo('Ready to go!')
 
 
 # Parametri
-speed = 80  # base = 120
+speed = 100  # base = 120
 pan = 10
 tilt = 11
 pan_min = -90
@@ -41,7 +41,7 @@ def zero():
     dxl_io.disable_torque([10, 11])
     dxl_io.set_joint_mode([10, 11])
     dxl_io.enable_torque([10, 11])
-    dxl_io.set_moving_speed({10: 200, 11: 200})
+    dxl_io.set_moving_speed({10: speed, 11: speed})
     dxl_io.set_goal_position({10: 0, 11: 0})
     time.sleep(1)
     dxl_io.disable_torque([10, 11])
@@ -60,17 +60,11 @@ def rotate_pan_neg():       # ruota in direzione - (CW)
 
 
 def rotate_tilt_plus():       # ruota in direzione + (CCW)
-    if not dxl_io.get_present_position((10, 11))[1] > tilt_max:
-        dxl_io.set_moving_speed({tilt: 1 * speed})
-    else:
-        stop(tilt)
+    dxl_io.set_moving_speed({tilt: 1 * speed})
 
 
 def rotate_tilt_neg():       # ruota in direzione - (CW)
-    if not dxl_io.get_present_position((10, 11))[1] < tilt_min:
-        dxl_io.set_moving_speed({tilt: -1 * speed})
-    else:
-        stop(tilt)
+    dxl_io.set_moving_speed({tilt: -1 * speed})
 
 
 # TODO: funzione di ricerca, pan e tilt si muovono
@@ -109,9 +103,9 @@ def callback(data):
     if roi.height > 0:
         # print dxl_io.get_present_position((10, 11))[1]
         # ruota tilt se il roi si trova fuori dalla zona di tolleranza
-        if roi_y_centre > cam_height/2 + tolerance and dxl_io.get_present_position((10, 11))[1] > tilt_min:
+        if roi_y_centre > cam_height/2 + tolerance and dxl_io.get_present_position((10, 11))[1] < tilt_max:
             rotate_tilt_plus()
-        elif roi_y_centre < cam_height/2 - tolerance and dxl_io.get_present_position((10, 11))[1] < tilt_max:
+        elif roi_y_centre < cam_height/2 - tolerance and dxl_io.get_present_position((10, 11))[1] > tilt_min:
             rotate_tilt_neg()
         else:
             stop(tilt)
