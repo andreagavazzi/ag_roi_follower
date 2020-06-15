@@ -1,4 +1,4 @@
-# ag_roi_tracker
+# ag_roi_follower
 Pan and Tilt roi follower for 2 Dynamixel actuators
 
 The node subscribes a /roi topic that brings a sensor_msgs/RegionOfInterest.msg:  
